@@ -36,6 +36,7 @@ Testing a simple response containing some JSON data.
 - Request Method: GET
 - Response Content-Type: application/json
 - Response Body:
+```json
 {
   "id": 1,
   "name": "Leanne Graham",
@@ -59,15 +60,18 @@ Testing a simple response containing some JSON data.
     "bs": "harness real-time e-markets"
   }
 }
+```
 - Status Code: 200 OK
 
 ## Request not found 
 - Request URL: https://jsonplaceholder.typicode.com/users/25
 - Request Method: GET
 - Response Body:
+```json
 {
   
 }
+```
 - Status Code: 404 Not Found
 
 ## JSON schema validation
