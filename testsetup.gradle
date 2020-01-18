@@ -1,0 +1,115 @@
+ext {
+    env = 'uat'
+    defaultTestPackage = "com.bodhivruksha.*"
+}
+
+/**
+ * Using the java exec task (more options)
+ * Usage:
+ * $ gradle clean testExec
+ * $ gradle clean testExec -Dcucumber.options="--tags @user"
+ * $ gradle clean testExec -Dcucumber.options="--tags @positive" -Djdk.module.illegalAccess=deny
+ * $ gradle clean testExec -Denv=test -Pthreads=5 -Pgroups=main -Psuite=smoke.xml -Pparallel=classes
+ */
+task testExec(type: JavaExec, dependsOn: ['clean',
+                                          'classes', 'testClasses',
+                                          'cleanClasses', 'cleanTestClasses']) {
+    classpath += files (
+            project.sourceSets.main.allJava.files ,
+            project.sourceSets.main.resources.files,
+            project.sourceSets.main.compileClasspath,
+            project.sourceSets.main.runtimeClasspath,
+            project.sourceSets.test.compileClasspath,
+            project.sourceSets.test.runtimeClasspath,
+    )
+
+    main = 'org.testng.TestNG'
+    systemProperties System.getProperties()
+    systemProperty 'env', System.properties['env'] ?: "${env}"
+    systemProperty "cucumber.options", System.getProperty("cucumber.options")
+
+    def resultDir = "$projectDir/build/test-results"
+    def suiteDir = "$projectDir/src/main/resources/test-suites"
+
+    args = ["-d", resultDir,
+            "-configfailurepolicy", "continue",
+            "-usedefaultlisteners", "true"]
+
+    if (project.hasProperty("groups")) {
+        args += ["-groups", "$groups"]
+    }
+
+    if (project.hasProperty("testclasses")) {
+        args += ["-testclass", "$testclasses"]
+    }
+
+    if (project.hasProperty("testmethods")) {
+        args += ["-methods", "$testmethods"]
+    }
+
+    if (project.hasProperty("parallel")) {
+        // possible values: tests|classes|methods
+        args += ["-parallel", "$parallel"]
+    } else {
+        args += ["-parallel", "methods"]
+    }
+
+    if (project.hasProperty("threads")) {
+        args += ["-threadcount", "$threads"]
+        args += ["-suitethreadpoolsize", "$threads"]
+    } else {
+        args += ["-threadcount", "1"]
+        args += ["-suitethreadpoolsize", "1"]
+    }
+
+    if (project.hasProperty("dataproviderthreads")) {
+        args += ["-dataproviderthreadcount", "$dataproviderthreads"]
+    } else {
+        args += ["-dataproviderthreadcount", "1"]
+    }
+
+    // Suites and test classes are mutually exclusive properties as the default xml changes respectively
+    if (project.hasProperty("suites")) {
+        // For multiple suites separated by comma, split first then add them with their full-path
+        def suiteList = "$suites".split(",")
+        suiteList.each { suite ->
+            args += ["$suiteDir/$suite"]
+        }
+    } else if (! (project.hasProperty("testmethods") || project.hasProperty("testclasses"))) {
+        // Inserting a default xml arg along with methods or testclass arg
+        // will lead to an exception in testng suite builder step
+        String defaultXml = "$projectDir/build/tmp/default.xml"
+
+        doFirst {
+            new File(defaultXml).text = defaultXmlText()
+        }
+        args += ["$defaultXml"]
+    }
+
+    doLast {
+        println "TestNG args: " + args
+        println "System property env value: ${System.properties.env}"
+        println "env default: $env"
+    }
+}
+
+def defaultXmlText() {
+     def packageName = "$defaultTestPackage"
+     if (project.hasProperty("testpackages")) {
+         packageName = "$testpackages"
+     }
+
+    def xmlText =
+    """\
+    <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+    |<suite name="default-test-suite" parallel="true">
+    |   <test name="default-test">
+    |       <packages>
+    |           <package name="$packageName" />
+    |       </packages>
+    |   </test>
+    |</suite> 
+    """.stripMargin().stripLeading()
+
+    return xmlText
+}

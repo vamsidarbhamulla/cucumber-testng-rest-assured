@@ -1,0 +1,45 @@
+group 'com.bodhivruksha'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+//Here you can specify the IDE that you will use and it will create tasks associated with it.
+apply plugin: 'idea'
+apply from: "testsetup.gradle"
+
+targetCompatibility = JavaVersion.VERSION_13
+sourceCompatibility = JavaVersion.VERSION_13
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main.java.srcDirs = ['src/main/java']
+    main.resources.srcDirs = ['src/main/resources']
+    test.java.srcDirs = ['src/test/java']
+    test.resources.srcDirs = ['src/test/resources']
+}
+
+ext {
+    testNgVersion = "7.1.0"
+    cucumberVersion = "4.8.1"
+    restassuredVersion = "4.1.2"
+}
+
+dependencies {
+    implementation fileTree('lib')
+    testImplementation fileTree('lib')
+
+    implementation group: 'io.cucumber', name: 'cucumber-java', version: "$cucumberVersion"
+    implementation group: 'io.cucumber', name: 'cucumber-core', version: "$cucumberVersion"
+    implementation group: 'io.cucumber', name: 'cucumber-testng', version: "$cucumberVersion"
+    implementation group: 'io.cucumber', name: 'datatable', version: '3.2.0'
+
+    implementation group: 'io.rest-assured', name: 'rest-assured', version: "$restassuredVersion"
+    implementation group: 'io.rest-assured', name: 'json-path', version: "$restassuredVersion"
+    implementation group: 'io.rest-assured', name: 'json-schema-validator', version: "$restassuredVersion"
+
+    implementation group: 'org.testng', name: 'testng', version: "$testNgVersion"
+}
+
+

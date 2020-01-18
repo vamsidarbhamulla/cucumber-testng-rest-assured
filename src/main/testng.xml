@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="BDD Test Suite" verbose="1"
+       parallel="methods" thread-count="1"
+       data-provider-thread-count="5"
+       configfailurepolicy="continue">
+    <test name="Login and Update Profile Test" annotations="JDK" preserve-order="true">
+        <classes>
+            <class name="com.bodhivruksha.TestNgCucumberScenarioRunner"/>
+        </classes>
+    </test>
+</suite>
