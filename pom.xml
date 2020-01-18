@@ -47,13 +47,6 @@
             <version>3.2.0</version>
         </dependency>
 
-        <!-- Required for jdk 9 or later to work with cucumber -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
@@ -106,7 +99,6 @@
                             <value>${dp-thread-count}</value>
                         </property>
                     </properties>
-                    <!--<skipITs>${skipIT}</skipITs>-->
                 </configuration>
                 <executions>
                     <execution>
